@@ -1,0 +1,112 @@
+---
+title: "Predicting the Classification of the Satellite Images"
+output: word_document
+---
+```{r}
+library(mlbench)
+library(randomForest)
+require(foreign)
+require(nnet)
+
+# load the data
+data("Satellite")
+
+# this will re-order alphabetically class labels and remove spacing
+Satellite$classes <- gsub(" ", "_", Satellite$classes)
+Satellite$classes <- factor( as.character(Satellite$classes))
+
+# to have the same initial split
+set.seed(777222)
+D = nrow(Satellite)
+keep = sample(1:D, 5500)
+test = setdiff(1:D, keep)
+
+dat = Satellite[keep,]      #training and validation 
+dat_test = Satellite[test,] #testing
+```
+
+```{r}
+N=nrow(dat) # store number of observations
+K=5 # set number of folds
+R=50 # set the replicates
+
+out = vector("list",R) # store accuracy output
+best = matrix(NA, R, K) # store best classifier
+
+for(r in 1:R)
+{
+  acc= matrix(NA,K,2) # accuracy of the two classifiers in the K folds
+  folds = rep( 1:K, ceiling(N/K) )
+  folds = sample(folds) # random permute
+  folds = folds[1:N] # ensure we got N data points
+    for ( k in 1:K ) {
+    train = which(folds != k) # train data
+    val = setdiff(1:N, train) # validation data
+    
+    # fitting the random forest model on the training data
+    fit1=randomForest(classes~.,data=dat,subset=train) 
+    
+    # fitting the multinomial logistic regression on the training data
+    fit2=multinom(classes~.,data=dat,subset=train) 
+    
+    # accuracy for the random forest model
+    pred1=predict(fit1,type="class",newdata=dat[val,])
+    tab1=table(dat$classes[val],pred1)
+    acc[k,1]=sum(diag(tab1))/sum(tab1)
+    
+    # accuracy for the mutinomial logistic regression model
+    pred2=predict(fit2,type="class",newdata=dat[val,])
+    tab2=table(dat$classes[val],pred2)
+    acc[k,2]=sum(diag(tab2))/sum(tab2)
+    
+    # best model having higher accuracy
+    best[r,k]=ifelse(acc[k,1]>acc[k,2],"Random Forest","MLR")
+    
+    }
+  out[[r]] = acc
+}
+
+```
+Here is the average fold accuracy for random forest and nultinomial logistic regression model in all replications.
+```{r}
+avg_fold = t(sapply(out, colMeans)) 
+head(avg_fold)
+```
+Then the estimated mean accuracy for all replications
+```{r}
+estmean = colMeans(avg_fold);estmean
+```
+And, the standard deviation of accuracy for all replications
+```{r}
+sd = apply(avg_fold, 2, sd)/sqrt(R);sd
+```
+
+```{r}
+# plot the mean accuracies over 100 replications
+matplot(avg_fold, type = "l", lty = c(2,3), xlab = "Replications", ylab = "Accuracy",col = c("black", "blue"))
+bounds1 <- rep( c(estmean[1] - 2*sd[1], estmean[1] + 2*sd[1]), each = R )
+bounds2 <- rep( c(estmean[2] - 2*sd[2], estmean[2] + 2*sd[2]), each = R )
+polygon(c(1:R, R:1), bounds1, col = adjustcolor("black", 0.2), border = FALSE)
+polygon(c(1:R, R:1), bounds2, col = adjustcolor("blue", 0.2), border = FALSE)
+abline(h = estmean, col = c("black", "blue"))
+legend("right", fill = c("black", "blue"), legend = c("Random Forest", "MLR"), bty = "n")
+```
+Overall, the random forest has a better average accuracy and a lower variability in the estimates compared to the classification tree.
+
+The object best contains the number of times each of the two classifier was selected as the best one in all the replications and folds. We can calculate the overall proportion of times each of the two classifiers was chosen as the best one.
+
+```{r}
+# proportion of times each model is chosen to be the best model
+prop.table(table(best))
+```
+
+```{r}
+# accuracy of the best model on the unseen test data
+bestpred = predict(fit1,type="class",newdata=dat_test)
+besttab=table(dat_test$classes,bestpred)
+besttab
+```
+
+```{r}
+sum(diag(besttab))/sum(besttab)
+```
