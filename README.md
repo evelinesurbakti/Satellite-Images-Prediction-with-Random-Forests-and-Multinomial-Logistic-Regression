@@ -11,6 +11,3 @@ compared and based on the generalization performance evaluation, we can find the
 ## Methods
 - Random Forest
 - Multinomial Logistic Regression
-
-
-The code is based on STAT30270 - Statistical Machine Learning Module (by Michael Fop) with additional modification
