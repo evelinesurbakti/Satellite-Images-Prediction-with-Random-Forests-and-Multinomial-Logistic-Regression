@@ -44,20 +44,20 @@ for(r in 1:R)
     val = setdiff(1:N, train) # validation data
     
     # fitting the random forest model on the training data
-    fit1=randomForest(classes~.,data=dat,subset=train) 
+    RF_model=randomForest(classes~.,data=dat,subset=train) 
     
     # fitting the multinomial logistic regression on the training data
-    fit2=multinom(classes~.,data=dat,subset=train) 
+    MN_model=multinom(classes~.,data=dat,subset=train) 
     
     # accuracy for the random forest model
-    pred1=predict(fit1,type="class",newdata=dat[val,])
-    tab1=table(dat$classes[val],pred1)
-    acc[k,1]=sum(diag(tab1))/sum(tab1)
+    RF_Predict=predict(RF_model,type="class",newdata=dat[val,])
+    RF_Table=table(dat$classes[val],RF_Predict)
+    acc[k,1]=sum(diag(RF_Table))/sum(RF_Table)
     
     # accuracy for the mutinomial logistic regression model
-    pred2=predict(fit2,type="class",newdata=dat[val,])
-    tab2=table(dat$classes[val],pred2)
-    acc[k,2]=sum(diag(tab2))/sum(tab2)
+    MN_Predict=predict(MN_model,type="class",newdata=dat[val,])
+    MN_Table=table(dat$classes[val],MN_Predict)
+    acc[k,2]=sum(diag(MN_Table))/sum(MN_Table)
     
     # best model having higher accuracy
     best[r,k]=ifelse(acc[k,1]>acc[k,2],"Random Forest","MLR")
@@ -102,7 +102,7 @@ prop.table(table(best))
 
 ```{r}
 # accuracy of the best model on the unseen test data
-bestpred = predict(fit1,type="class",newdata=dat_test)
+bestpred = predict(RF_model,type="class",newdata=dat_test)
 besttab=table(dat_test$classes,bestpred)
 besttab
 ```
