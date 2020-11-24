@@ -15,11 +15,12 @@ Satellite from mlbench package.
 - Random Forest
 - Multinomial Logistic Regression
 
-Here is the detail of both methods and predictive performance for the data. 
+Here is the steps of both methods and predictive performance for the data. 
 1. Data Preparation 
 2. Fitting Both Models 
+3. Check the Fold Accuracy
 
-Here is the average fold accuracy for random forest and multinomial logistic regression model in all replications.  The random forest has average around 91.4% while the multinomial logistic regression has a lower accuracy around 80.6%. And, the standard deviation of mean accuracy for all replications are good, below 1%.
+The figure below is the average fold accuracy for random forest and multinomial logistic regression model in all replications. The random forest has average around **91.4%** while the multinomial logistic regression has a lower accuracy around **80.6%**. And, the standard deviation of mean accuracy for all replications are good, below **1%**.
 
 ![](./rf.png)
 
