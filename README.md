@@ -1,4 +1,4 @@
-# Satellite Images Prediction with Random Forests and Multinomila Logistic Regression
+# Satellite Images Prediction with Random Forests and Multinomial Logistic Regression
 In this report, random forests and multinomial logistic regression are used on the dataset Satellite
 available in package ***mlbench*** contains 6435 images displaying different scenes recorded by the
 Landsat satellite program. Each row of the data correspond to an image, which encodes a scene in
