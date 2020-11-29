@@ -9,8 +9,8 @@ The task is to predict the classification of the satellite images. In doing so, 
 compared and based on the generalization performance evaluation, we can find the best model.
 
 ## Data Set 
-Satellite from mlbench package. 
-
+Satellite from <a href= https://cran.r-project.org/web/packages/mlbench/mlbench.pdf> mlbench <a/> package.
+  
 ## Models
 - Random Forest
 - Multinomial Logistic Regression
